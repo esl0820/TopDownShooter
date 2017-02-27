@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Health : MonoBehaviour {
+//Enemy Systems
 
-	public float speed;
-	float t = 0f;
-	float rotate;
-	public float vision;
+public class Enemy : MonoBehaviour {
+
+	float health;
+	float speed;
+	float damage;
 
 	// Use this for initialization
 	void Start () {
@@ -17,31 +18,65 @@ public class Enemy : Health : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		transform.Translate (Vector3.forward * speed * Time.deltaTime);
-
-		if (this.tag == "Beetle") {
-			Beetle ();
-		}
-		if (this.tag == "Mosquito") {
-			Mosquito ();
+		if (health < 1) {
+			this.GetComponent<SpeedIncrease>().increaseSpeed = true;
 		}
 		
 	}
+		
+}
 
-	void Beetle () {
-		rotate = Random.Range (-90, 90);
+public class Mosquito : Enemy {
+	//for now just look at the player
+	//when shoots, cause slight damage and stun
+}
 
-		var fwd = transform.TransformDirection (Vector3.forward);
+public class Beetle : Enemy {
+	//follow player
+	//on collision cause damage
+}
 
-		if (Physics.Raycast (transform.position, fwd, vision)) {
-			transform.Rotate (0, rotate, 0);
-		}
+public class Bee : Enemy {
+	//move quickly and randomly across the screen
+	//maybe in a sin wave?
+	//increase speed when enemies die
+	//on collision die and stun
+}
+
+//Enemy Manager
+
+pulic class EnemyManager : MonoBehaviour {
+
+	public List<Enemy> enemyList;
+
+	void Start () {
+		enemyList = new List<Enemy>();
 	}
 
-	void Mosquito () {
-		transform.position.x = 3f * Mathf.Cos(t);
-		transform.position.y += speed * Time.deltaTime;
-
-		t += Time.deltaTime;
+	void SpawnWave () {
+		//when the list of enemies goes bellow 1, run this <- Does this go in update?
+		//for loop for a number of enemies between 6-8
 	}
+
+	void Spawn () {
+		//spawn a random type of enemy
+		//add to the list of enemies
+		//throw an event to the event manager telling it that something died
+		enemyList.Add(Enemy);
+	}
+
+}
+
+public abstract class EnemyEvents : MonoBehaviour {
+
+}
+
+public class SpeedIncrease : EnemyEvents {
+
+	bool increaseSpeed = false;
+
+	if (increaseSpeed == true) {
+		this.GetComponent<Enemy>().speed * 1.5f;
+	}
+
 }
